@@ -4,3 +4,4 @@
 ![Dysplay](/Help/layout-ups.jpg)
 ![Dysplay](/Help/schematic-ups.jpg)
 ![Dysplay](/Help/battery-ups.jpg)
+![Dysplay](/Help/sensor-schem.png)
