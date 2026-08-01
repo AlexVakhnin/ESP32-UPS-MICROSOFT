@@ -1,18 +1,39 @@
 #include <Arduino.h>
 
-// put function declarations here:
-int myFunction(int, int);
+extern void ble_ups_init();
+extern void update_battery_level(uint8_t blevel);
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  Serial.begin(115200);
+
+  //LED (internal)
+  pinMode(8, OUTPUT);
+  digitalWrite(8, HIGH); //led = OFF
+  //digitalWrite(8, LOW); //led = ON
+  
+  delay(7000);  //10 sec for Platformio start terminal...
+
+  Serial.println();
+  Serial.println("BLE Battery Level Indicator");
+  //Serial.println();
+  Serial.println("----------------Start Info-----------------");
+  Serial.printf("Total heap:\t%d \r\n", ESP.getHeapSize());
+  Serial.printf("Free heap:\t%d \r\n", ESP.getFreeHeap());
+  //Serial.println("ADC_PIN= "+String(sens_pin));
+  Serial.println("-----------------------------------------");
+
+  ble_ups_init();
+  Serial.println("OK!-START..");
 }
+
+uint8_t battery_level = 0;
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
+  update_battery_level(battery_level);  //change Battery Service value
+  //Serial.println(int(battery_level));
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  delay(5000);
+  battery_level++;
+  if (int(battery_level) == 100)
+    battery_level = 0;
 }
