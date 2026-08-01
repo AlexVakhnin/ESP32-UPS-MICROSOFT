@@ -27,9 +27,11 @@ class MyServerCallbacks : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
         Serial.println("Event-Connect..");
         _BLEConnected = true;
+        digitalWrite(8, LOW); //led = ON
     };
     void onDisconnect(BLEServer* pServer) {
         _BLEConnected = false;
+        digitalWrite(8, HIGH); //led = OFF
         Serial.println("Event-Disconnect..");
         delay(300); // give the bluetooth stack the chance to get things ready
         BLEDevice::startAdvertising();  // restart advertising
