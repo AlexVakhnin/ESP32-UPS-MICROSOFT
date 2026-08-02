@@ -1,4 +1,5 @@
 import asyncio
+import subprocess
 import threading
 import time
 from PIL import Image, ImageDraw
@@ -9,10 +10,10 @@ import pystray
 DEVICE_ADDRESS = "EC:DA:3B:BE:25:16"  # MAC вашего устройства (для macOS укажите UUID)
 BATTERY_CHAR_UUID = "00002a19-0000-1000-8000-00805f9b34fb"  # Стандартный UUID BLE Battery Level
 UPDATE_INTERVAL = 60  # Интервал опроса в секундах
+CRITICAL_LEVEL = -1  # Порог заряда (в %), при котором сработает "shutdown" (-1 disable)
 
 # Глобальные переменные состояния
 current_battery = "Узнаем..."
-#current_battery = 100
 is_running = True
 icon = None
 
@@ -60,7 +61,7 @@ async def fetch_battery():
 
 
 def ble_loop_worker():
-    """Фоновый цикл обновления данных о батарее"""
+    """Фоновый цикл обновления данных o батарее"""
     global icon
     # Создаем новый цикл событий для отдельного потока
     loop = asyncio.new_event_loop()
@@ -68,6 +69,10 @@ def ble_loop_worker():
 
     while is_running:
         level = loop.run_until_complete(fetch_battery())
+
+        # Windows shutdown по условию
+        if level <= CRITICAL_LEVEL:
+            subprocess.run(["shutdown", "/s", "/t", "0"])
 
         if icon:
             # Обновляем текст при наведении

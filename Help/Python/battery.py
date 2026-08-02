@@ -5,7 +5,7 @@ from bleak import BleakClient
 # --- НАСТРОЙКИ ---
 DEVICE_ADDRESS = "EC:DA:3B:BE:25:16"  # Замените на MAC вашего устройства
 BATTERY_CHAR_UUID = "00002a19-0000-1000-8000-00805f9b34fb"  # Стандартный UUID характеристики заряда
-# CRITICAL_LEVEL = 20  # Порог заряда (в %), при котором сработает скрипт
+CRITICAL_LEVEL = -1  # Порог заряда (в %), при котором сработает скрипт
 # SCRIPT_PATH = r"C:\path\to\your\script.bat"  # Полный путь к вашему Windows-скрипту (.bat, .exe или .ps1)
 CHECK_INTERVAL = 60  # Интервал проверки устройства (в секундах)
 # ------------------
@@ -22,10 +22,11 @@ async def check_battery():
                 print(f"Текущий уровень заряда BLE устройства: {battery_level}%")
                 
                 # Проверяем условие
-                #if battery_level <= CRITICAL_LEVEL:
+                if battery_level <= CRITICAL_LEVEL:
                 #    print(f"Внимание! Заряд ниже {CRITICAL_LEVEL}%. Запуск внешнего скрипта...")
                 #    # Запуск Windows скрипта
                 #    subprocess.run(SCRIPT_PATH, shell=True)
+                    subprocess.run(["shutdown", "/s", "/t", "0"])
                     
     except Exception as e:
         print(f"Ошибка при работе с BLE устройством: {e}")
