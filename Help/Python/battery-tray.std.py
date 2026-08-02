@@ -13,7 +13,7 @@ UPDATE_INTERVAL = 60  # Интервал опроса в секундах
 CRITICAL_LEVEL = -1  # Порог заряда (в %), при котором сработает "shutdown" (-1 disable)
 
 # Глобальные переменные состояния
-current_battery = "Scanning..."
+current_battery = "Узнаем..."
 is_running = True
 icon = None
 
@@ -56,7 +56,7 @@ async def fetch_battery():
                 return level
     except Exception as e:
         print(f"Ошибка подключения к BLE: {e}")
-        current_battery = "BLE Error.."
+        current_battery = "Ошибка"
     return None
 
 
@@ -76,11 +76,8 @@ def ble_loop_worker():
                 subprocess.run(["shutdown", "/s", "/t", "0"])
 
         if icon:
-            # Обновляем текст при наведении (Hint)
-            if isinstance(current_battery, str):
-                icon.title = current_battery
-            else:
-                icon.title = f"Battery level: {current_battery}%"
+            # Обновляем текст при наведении
+            icon.title = f"Батарея BLE: {current_battery}%"
             # Обновляем иконку на панели задач
             icon.icon = create_battery_icon(current_battery)
             icon.update_menu()
@@ -104,15 +101,15 @@ def start_tray():
     global icon
     menu = pystray.Menu(
         pystray.MenuItem(
-            lambda text: f"Battery level: {current_battery}%", action=None, enabled=False
+            lambda text: f"Заряд: {current_battery}%", action=None, enabled=False
         ),
-        pystray.MenuItem("Exit", on_exit),
+        pystray.MenuItem("Выход", on_exit),
     )
 
     icon = pystray.Icon(
         "ble_battery_monitor",
         create_battery_icon(current_battery),
-        title="Monitoring BLE Battery...",
+        title="Мониторинг BLE батареи...",
         menu=menu,
     )
 
