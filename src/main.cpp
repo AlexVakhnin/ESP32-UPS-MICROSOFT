@@ -3,6 +3,8 @@
 extern void ble_ups_init();
 extern void update_battery_level(uint8_t blevel);
 extern void wdt_handle();
+extern void terminal_init();
+extern uint8_t read_battery_level();
 
 void setup() {
   Serial.begin(115200);
@@ -21,19 +23,20 @@ void setup() {
   //Serial.println("ADC_PIN= "+String(sens_pin));
   Serial.println("------------------------------------------");
 
+  terminal_init();
   ble_ups_init();
+  
   Serial.println("OK!-START..");
 }
 
-uint8_t battery_level = 0;
+//uint8_t battery_level = 0;
 
 void loop() {
-  update_battery_level(battery_level);  //change Battery Service value
-  //Serial.println(int(battery_level));
+  update_battery_level(read_battery_level());  //change Battery Service value
 
   wdt_handle();
   delay(5000); //5 sec.
-  battery_level++;
-  if (int(battery_level) == 100)
-    battery_level = 0;
+  //battery_level++;
+  //if (int(battery_level) == 100)
+  //  battery_level = 0;
 }
