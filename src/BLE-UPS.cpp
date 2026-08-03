@@ -79,6 +79,8 @@ void ble_ups_init(){
 
 //change Battery service value
 void update_battery_level(uint8_t blevel){ 
-  pBattCharacteristic.setValue(&blevel, 1);
-  pBattCharacteristic.notify();
+    if (blevel > 100) {blevel=100;}
+    if (blevel < 0) {blevel=0;}
+    pBattCharacteristic.setValue(&blevel, 1);
+    pBattCharacteristic.notify();
 }

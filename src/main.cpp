@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
-extern void ble_ups_init();
-extern void update_battery_level(uint8_t blevel);
+extern void ble_ups_init(); //BLE-UPS.cpp
+extern void update_battery_level(uint8_t blevel); //BLE-UPS.cpp
 
 void setup() {
   Serial.begin(115200);
@@ -9,13 +9,11 @@ void setup() {
   //LED (internal)
   pinMode(8, OUTPUT);
   digitalWrite(8, HIGH); //led = OFF
-  //digitalWrite(8, LOW); //led = ON
   
   delay(7000);  //10 sec for Platformio start terminal...
 
   Serial.println();
   Serial.println("BLE Battery Level Indicator");
-  //Serial.println();
   Serial.println("----------------Start Info-----------------");
   Serial.printf("Total heap:\t%d \r\n", ESP.getHeapSize());
   Serial.printf("Free heap:\t%d \r\n", ESP.getFreeHeap());
