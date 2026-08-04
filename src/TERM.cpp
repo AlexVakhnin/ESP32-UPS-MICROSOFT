@@ -91,7 +91,7 @@ String parse_string(String in_str){
     }
     else if (in_str=="atz") { //atz - reset NVRAM
         reset_nvram();
-        ret_str = "NVRAM Keys Reset..";
+        ret_str = "NVRAM Keys Reset..\r\n";
     }
     else if (in_str=="atr") { //atr - reboot device
         ESP.restart();
