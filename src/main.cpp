@@ -36,14 +36,9 @@ void setup() {
   Serial.println("OK!-START..");
 }
 
-//uint8_t battery_level = 0;
-
 void loop() {
   update_battery_level(read_battery_level());  //change Battery Service value
 
   wdt_handle();
   delay(5000); //5 sec.
-  //battery_level++;
-  //if (int(battery_level) == 100)
-  //  battery_level = 0;
 }
