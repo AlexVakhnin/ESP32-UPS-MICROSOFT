@@ -1,4 +1,5 @@
 #include <Arduino.h>
+//#include <nvs_flash.h> //for all NVRAM clean
 
 extern void ble_ups_init();
 extern void update_battery_level(uint8_t blevel);
@@ -7,13 +8,19 @@ extern void terminal_init();
 extern uint8_t read_battery_level();
 
 void setup() {
+  delay(7000);  //10 sec for Platformio start terminal...
+
   Serial.begin(115200);
+
+//for all NVRAM erase (#include <nvs_flash.h>)
+    //nvs_flash_erase();      // erase the NVS partition and...
+    //nvs_flash_init();       // initialize the NVS partition.
+    //Serial.print("NVRAM cleared, STOP..");
+    //while (true); //STOP..
 
   //LED (internal)
   pinMode(8, OUTPUT);
-  digitalWrite(8, HIGH); //led = OFF
-  
-  delay(7000);  //10 sec for Platformio start terminal...
+  digitalWrite(8, HIGH); //led = OFF 
 
   Serial.println();
   Serial.println("BLE Battery Level Indicator");
