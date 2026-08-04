@@ -73,8 +73,8 @@ String parse_string(String in_str){
     String ret_str = "???\r\n";
 
     // actions are performed depending on the command
-    if (in_str=="at") {     //at
-        ret_str="OK\r\n"; //sensor number
+    if (in_str=="at") {     //at test
+        ret_str="OK\r\n";
     }
     else if (in_str=="at?") { //at? - help
         ret_str = String(shelp);
