@@ -3,6 +3,7 @@
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
+//#include "esp_pm.h" //power manager from esp-idf
 
 //Nordic UART Service (NUS)
 #define Service_Term_UUID "6E400001-B5A3-F393-E0A9-E50E24DCCA9E" //offset: 0x0001
@@ -79,6 +80,23 @@ void ble_ups_init(){
     pTerm->start(); //Service Terminal start
     pBatt->start(); //Service Battery start
     pServer->getAdvertising()->start(); //Advertising start
+
+/*
+//Configure Power Management for Automatic Light Sleep
+  esp_pm_config_esp32c3_t pm_config = {
+    .max_freq_mhz = 160,        // Max CPU frequency (can be 80 or 160 for C3)
+    .min_freq_mhz = 80,         // Min CPU frequency when idle
+    .light_sleep_enable = true  // Crucial: Enables automatic light sleep
+  };
+
+  // Apply the power management settings
+  esp_err_t err = esp_pm_configure(&pm_config);
+  if (err == ESP_OK) {
+    Serial.println("BLE Modem + Auto Light Sleep Configured!");
+  } else {
+    Serial.printf("Failed to configure power management: %d\n", err);
+  }
+*/
 }
 
 //change Battery service value
@@ -92,7 +110,7 @@ void update_battery_level(uint8_t blevel){
 void wdt_handle(){
   if(_BLEConnected and m_connect_id != -1){
     wdt_counter++;
-    if(wdt_counter>10){ //30
+    if(wdt_counter>30){ //30 * 5 sec
       wdt_counter=0;
       pServer->disconnect(m_connect_id) ;//force disconnect client..
     }
