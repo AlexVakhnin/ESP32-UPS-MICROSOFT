@@ -6,6 +6,11 @@ extern void update_battery_level(uint8_t blevel);
 extern void wdt_handle();
 extern void terminal_init();
 extern uint8_t read_battery_level();
+extern void adc_filter_handle();
+
+//long time_now=0;
+long time_last_wdt=0;
+long time_last_adc=0;
 
 void setup() {
   delay(7000);  //10 sec for Platformio start terminal...
@@ -37,8 +42,19 @@ void setup() {
 }
 
 void loop() {
-  update_battery_level(read_battery_level());  //change Battery Service value
+  long time_now=millis();
+  //Task T=1sec.
+  if( abs(time_now - time_last_adc) >= 1000 or time_last_adc > time_now){
+    //Serial.println(time_now - time_last_adc);
+    adc_filter_handle();
 
-  wdt_handle();
-  delay(5000); //5 sec.
+    time_last_adc=time_now;
+  }
+  //Task T=5sec.
+  if( abs(time_now - time_last_wdt) >= 5000 or time_last_wdt > time_now){
+    //Serial.println(time_now - time_last_wdt);
+    update_battery_level(read_battery_level());  //change Battery Service value
+    wdt_handle();
+    time_last_wdt=time_now;
+  }
 }

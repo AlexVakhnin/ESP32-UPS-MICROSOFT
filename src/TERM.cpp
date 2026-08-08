@@ -10,6 +10,8 @@ float _max_voltage =0;  //maximum possible voltage (EEPROM) 12.5
 float _min_voltage =0;  //minimum possible voltage (EEPROM) 9.3
 float _att_factor = 0;  //attenuator factor (EEPROM) 5.13
 
+float _adc_filtered = 0; //filtered value of ADC
+
 const float _adc_ref =2.99; //reference voltage of the ADC
 
 const char shelp[] = "ati - parameter list\r\n"
@@ -28,7 +30,7 @@ void reset_nvram(){
 
 //read ADC and calculate values
 void calculate_current_values(){
-    int sens_value = analogRead(0);  //read ADC0 (pin 0)
+    float sens_value = _adc_filtered;//analogRead(0);  //read ADC0 (pin 0)
     float sens_voltage=sens_value * _adc_ref / 4096; // calculate (U_adc)
     _real_voltage = sens_voltage * _att_factor; //real voltage with attenuatir (U_inp)
     if (_real_voltage>_max_voltage){_real_voltage = _max_voltage;} //limiter
@@ -46,7 +48,7 @@ void calculate_current_values(){
 //attenuator calibration
 String storage_att_factor(String su){
     _max_voltage=su.toFloat(); //string to float
-    int sens_value = analogRead(0);  //read ADC0 (pin 0)
+    float sens_value = _adc_filtered;//analogRead(0);  //read ADC0 (pin 0)
     float sens_voltage=sens_value * _adc_ref / 4096; // calculate (U_adc)
     _att_factor = _max_voltage/sens_voltage;
     Serial.println("new att_factor="+String(_att_factor));
@@ -133,4 +135,9 @@ float read_voltage_sensor(){
 uint8_t read_battery_level(){
     calculate_current_values();
     return _battery_level;
+}
+
+//Exponential Moving Average, EMA filter
+void adc_filter_handle(){
+    _adc_filtered += (analogRead(0) - _adc_filtered) * 0.2; //filter (IIR)
 }
