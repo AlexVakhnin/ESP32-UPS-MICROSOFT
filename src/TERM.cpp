@@ -6,9 +6,9 @@ Preferences preferences; //for NVRAM
 float _real_voltage =0; //current measuring voltage ADC0 with attenuator
 uint8_t _battery_level = 0; //current battery level %
 
-float _max_voltage =0;  //maximum possible voltage (EEPROM) 12.5
-float _min_voltage =0;  //minimum possible voltage (EEPROM) 9.3
-float _att_factor = 0;  //attenuator factor (EEPROM) 5.13
+float _max_voltage =0;  //maximum possible voltage (NVRAM 12.5)
+float _min_voltage =0;  //minimum possible voltage (NVRAM 9.3)
+float _att_factor = 0;  //attenuator factor (NVRAM 4.1)
 
 float _adc_filtered = 0; //filtered value of ADC
 
@@ -120,7 +120,7 @@ void terminal_init(){
     preferences.begin("Battery", true); //NVRAM open (read only)
     _max_voltage = preferences.getFloat("max_voltage", 12.5);
     _min_voltage = preferences.getFloat("min_voltage", 9.3);
-    _att_factor = preferences.getFloat("att_factor", 4);  //5.13
+    _att_factor = preferences.getFloat("att_factor", 4.1);
     preferences.end(); //NVRAM close
     calculate_current_values();
 }
