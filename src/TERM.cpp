@@ -139,5 +139,5 @@ uint8_t read_battery_level(){
 
 //Exponential Moving Average, EMA filter
 void adc_filter_handle(){
-    _adc_filtered += (analogRead(0) - _adc_filtered) * 0.2; //filter (IIR)
+    _adc_filtered += (analogRead(0) - _adc_filtered) * 0.2; //filter simple IIR
 }
