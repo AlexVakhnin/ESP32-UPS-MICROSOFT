@@ -81,6 +81,7 @@ void ble_ups_init(){
     pBatt->start(); //Service Battery start
     pServer->getAdvertising()->start(); //Advertising start
 
+    
 /*
 //Configure Power Management for Automatic Light Sleep
   esp_pm_config_esp32c3_t pm_config = {

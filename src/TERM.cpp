@@ -113,8 +113,14 @@ String parse_string(String in_str){
 return ret_str;
 }
 
+//Exponential Moving Average, EMA filter
+void adc_filter_handle(){
+    _adc_filtered += (analogRead(0) - _adc_filtered) * 0.2; //filter simple IIR
+}
+
 void terminal_init(){
     pinMode(0, INPUT); // ADC0 pin input
+    _adc_filtered = analogRead(0); //first value of filtered
 
     //read all NVRAM parameters
     preferences.begin("Battery", true); //NVRAM open (read only)
@@ -135,9 +141,4 @@ float read_voltage_sensor(){
 uint8_t read_battery_level(){
     calculate_current_values();
     return _battery_level;
-}
-
-//Exponential Moving Average, EMA filter
-void adc_filter_handle(){
-    _adc_filtered += (analogRead(0) - _adc_filtered) * 0.2; //filter simple IIR
 }
