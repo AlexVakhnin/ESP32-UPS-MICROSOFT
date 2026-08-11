@@ -35,8 +35,9 @@ void calculate_current_values(){
     _real_voltage = sens_voltage * _att_factor; //real voltage with attenuatir (U_inp)
     if (_real_voltage>_max_voltage){_real_voltage = _max_voltage;} //limiter hight
     if (_real_voltage<_min_voltage){_real_voltage = _min_voltage;} //limiter low
-    float volts_per_percent = abs((_max_voltage-_min_voltage)/100);
-    float f_percent = abs((_real_voltage - _min_voltage) / volts_per_percent);
+    //float volts_per_percent = abs((_max_voltage-_min_voltage)/100);
+    //float f_percent = abs((_real_voltage - _min_voltage) / volts_per_percent);
+    float f_percent = (_real_voltage - _min_voltage)/(_max_voltage-_min_voltage)*100;
     _battery_level = round(f_percent);
 
         //Serial.println("int sens_value = "+String(sens_value));//DEBUG
@@ -125,9 +126,9 @@ void terminal_init(){
 
     //read all NVRAM parameters
     preferences.begin("Battery", true); //NVRAM open (read only)
-    _max_voltage = preferences.getFloat("max_voltage", 12.5);
-    _min_voltage = preferences.getFloat("min_voltage", 9.3);
-    _att_factor = preferences.getFloat("att_factor", 4.1);
+    _max_voltage = preferences.getFloat("max_voltage", 12.0);
+    _min_voltage = preferences.getFloat("min_voltage", 9.0);
+    _att_factor = preferences.getFloat("att_factor", 4.0);
     preferences.end(); //NVRAM close
     calculate_current_values();
 }
