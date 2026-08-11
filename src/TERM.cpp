@@ -33,7 +33,8 @@ void calculate_current_values(){
     float sens_value = _adc_filtered;//analogRead(0);  //read ADC0 (pin 0)
     float sens_voltage=sens_value * _adc_ref / 4096; // calculate (U_adc)
     _real_voltage = sens_voltage * _att_factor; //real voltage with attenuatir (U_inp)
-    if (_real_voltage>_max_voltage){_real_voltage = _max_voltage;} //limiter
+    if (_real_voltage>_max_voltage){_real_voltage = _max_voltage;} //limiter hight
+    if (_real_voltage<_min_voltage){_real_voltage = _min_voltage;} //limiter low
     float volts_per_percent = abs((_max_voltage-_min_voltage)/100);
     float f_percent = abs((_real_voltage - _min_voltage) / volts_per_percent);
     _battery_level = round(f_percent);
