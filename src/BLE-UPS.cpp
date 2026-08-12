@@ -3,7 +3,7 @@
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
-//#include "esp_pm.h" //power manager from esp-idf
+//#include "esp_bt.h" // Нужен для настройки мощности TX
 
 //Nordic UART Service (NUS)
 #define Service_Term_UUID "6E400001-B5A3-F393-E0A9-E50E24DCCA9E" //offset: 0x0001
@@ -62,6 +62,13 @@ class MyRxCallbacks: public BLECharacteristicCallbacks {
 
 void ble_ups_init(){
     BLEDevice::init("UPS-PC-WIN11"); //init BLE stack..
+
+    //---------------
+    // 2. Снижение мощности TX (для ESP32-C3 доступно от -24 до +21 dBm)
+    // ESP_PWR_LVL_N9 (-9 dBm) или ESP_PWR_LVL_N12 (-12 dBm) сильно экономят ток
+    //esp_ble_tx_power_set(ESP_BLE_PWR_TYPE_DEFAULT, ESP_PWR_LVL_N9);
+    //esp_ble_tx_power_set(ESP_BLE_PWR_TYPE_ADV, ESP_PWR_LVL_N9);
+    //---------------
     
     pServer = BLEDevice::createServer();  //Srever create
     pServer->setCallbacks(new MyServerCallbacks()); //set callback for Server
@@ -79,25 +86,28 @@ void ble_ups_init(){
     pServer->getAdvertising()->addServiceUUID(Service_Term_UUID);  //Advertising init
     pTerm->start(); //Service Terminal start
     pBatt->start(); //Service Battery start
+
+    //--------------
+    // 4. Настройка интервалов рекламы (Advertising)
+    //BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+    //pAdvertising->addServiceUUID(Service_Term_UUID);//?????
+    //pAdvertising->addServiceUUID(pBatt->getUUID());
+    //pAdvertising->setScanResponse(true);
+  
+    // Увеличиваем интервал рекламы до 1.5 секунд (1500 мс / 0.625 = 2400)
+    //pAdvertising->setMinInterval(2400); 
+    //pAdvertising->setMaxInterval(2400);
+  
+    // 5. Запрос на редкие интервалы соединения после подключения смартфона
+    // Мин интервал: 200мс (160 * 1.25), Макс интервал: 400мс (320 * 1.25)
+    // Slave Latency: 4 (пропуск 4 тактов связи), Timeout: 6 секунд (600)
+    //pAdvertising->setMinPreferred(160);
+    //pAdvertising->setMaxPreferred(320); 
+
+    //BLEDevice::startAdvertising(); //Advertising start
+    //--------------
     pServer->getAdvertising()->start(); //Advertising start
 
-    
-/*
-//Configure Power Management for Automatic Light Sleep
-  esp_pm_config_esp32c3_t pm_config = {
-    .max_freq_mhz = 160,        // Max CPU frequency (can be 80 or 160 for C3)
-    .min_freq_mhz = 80,         // Min CPU frequency when idle
-    .light_sleep_enable = true  // Crucial: Enables automatic light sleep
-  };
-
-  // Apply the power management settings
-  esp_err_t err = esp_pm_configure(&pm_config);
-  if (err == ESP_OK) {
-    Serial.println("BLE Modem + Auto Light Sleep Configured!");
-  } else {
-    Serial.printf("Failed to configure power management: %d\n", err);
-  }
-*/
 }
 
 //change Battery service value

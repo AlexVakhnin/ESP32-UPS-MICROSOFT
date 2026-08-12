@@ -52,4 +52,7 @@ void loop() {
     wdt_handle();
     time_last_wdt=time_now;
   }
+
+  // Позволяем FreeRTOS усыпить процессор на 1 секунду до следующей проверки
+  vTaskDelay(pdMS_TO_TICKS(500)); //1000
 }
