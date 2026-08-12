@@ -83,14 +83,14 @@ void ble_ups_init(){
     pBatt->addCharacteristic(&pBattCharacteristic);  //Characteristic Batt (Read, Notify)
     pBattCharacteristic.addDescriptor(new BLE2902());  //notifications control from client side
 
-    pServer->getAdvertising()->addServiceUUID(Service_Term_UUID);  //Advertising init
     pTerm->start(); //Service Terminal start
     pBatt->start(); //Service Battery start
+    pServer->getAdvertising()->addServiceUUID(Service_Term_UUID);  //Advertising init
+    pServer->getAdvertising()->start(); //Advertising start
 
     //--------------
     // 4. Настройка интервалов рекламы (Advertising)
     //BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
-    //pAdvertising->addServiceUUID(Service_Term_UUID);//?????
     //pAdvertising->addServiceUUID(pBatt->getUUID());
     //pAdvertising->setScanResponse(true);
   
@@ -106,7 +106,6 @@ void ble_ups_init(){
 
     //BLEDevice::startAdvertising(); //Advertising start
     //--------------
-    pServer->getAdvertising()->start(); //Advertising start
 
 }
 
