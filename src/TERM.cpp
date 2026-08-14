@@ -10,7 +10,9 @@ float _max_voltage =0;  //maximum possible voltage (NVRAM 12.5)
 float _min_voltage =0;  //minimum possible voltage (NVRAM 9.3)
 float _att_factor = 0;  //attenuator factor (NVRAM 4.1)
 
-float _adc_filtered = 0; //filtered value of ADC
+volatile float _adc_filtered = 0; //filtered value of ADC
+volatile float _adc_raw = 0; //filtered value of ADC
+
 
 const float _adc_ref =2.99; //reference voltage of the ADC
 
@@ -109,15 +111,19 @@ String parse_string(String in_str){
             +"\r\nmax_voltage="+String(_max_voltage)
             +"\r\nmin_voltage="+String(_min_voltage)
             +"\r\natt_factor="+String(_att_factor) 
-            +"\r\nadc_ref_voltage="+String(_adc_ref)+"\r\n";
+            +"\r\nadc_ref_voltage="+String(_adc_ref)
+            +"\r\nadc_raw="+String(_adc_raw)
+            +"\r\nadc_filtered="+String(_adc_filtered)+"\r\n";
     }
             
 return ret_str;
 }
 
-//Exponential Moving Average, EMA filter
+//Exponential Moving Average, EMA filter---------------------------------------
 void adc_filter_handle(){
-    _adc_filtered += (analogRead(0) - _adc_filtered) * 0.2; //filter simple IIR
+    _adc_raw = analogRead(0);
+    //Serial.println("adc_in: "+String(_adc_raw));
+    _adc_filtered += (_adc_raw - _adc_filtered) * 0.2; //filter simple IIR
 }
 
 void terminal_init(){

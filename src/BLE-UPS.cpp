@@ -4,6 +4,8 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 //#include "esp_bt.h" // Нужен для настройки мощности TX
+#include <esp_wifi.h> //нужен для полного отключения передатчика WIFI
+
 
 //Nordic UART Service (NUS)
 #define Service_Term_UUID "6E400001-B5A3-F393-E0A9-E50E24DCCA9E" //offset: 0x0001
@@ -61,8 +63,11 @@ class MyRxCallbacks: public BLECharacteristicCallbacks {
 
 
 void ble_ups_init(){
-    BLEDevice::init("UPS-PC-WIN11"); //init BLE stack..
+    // Completely halt the Wi-Fi modem to isolate BLE
+    esp_wifi_stop(); 
 
+    BLEDevice::init("UPS-PC-WIN11"); //init BLE stack..
+    
     //---------------
     // 2. Снижение мощности TX (для ESP32-C3 доступно от -24 до +21 dBm)
     // ESP_PWR_LVL_N9 (-9 dBm) или ESP_PWR_LVL_N12 (-12 dBm) сильно экономят ток
