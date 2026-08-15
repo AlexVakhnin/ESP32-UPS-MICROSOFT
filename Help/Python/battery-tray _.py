@@ -9,11 +9,14 @@ import pystray
 # НАСТРОЙКИ
 DEVICE_ADDRESS = "EC:DA:3B:BE:25:16"  # MAC вашего устройства (для macOS укажите UUID)
 BATTERY_CHAR_UUID = "00002a19-0000-1000-8000-00805f9b34fb"  # Стандартный UUID BLE Battery Level
+TX_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
+RX_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
 UPDATE_INTERVAL = 60  # Интервал опроса в секундах
 CRITICAL_LEVEL = -1  # Порог заряда (в %), при котором сработает "shutdown" (-1 disable)
 
 # Глобальные переменные состояния
-current_battery = "Узнаем..."
+current_battery = "Scanning..."
+current_voltage = "Scanning..."
 is_running = True
 icon = None
 
@@ -46,6 +49,8 @@ def create_battery_icon(percentage):
 async def fetch_battery():
     """Асинхронный запрос заряда батареи через Bleak"""
     global current_battery
+    global current_voltage
+    data_to_send = bytearray(b"atv")
     try:
         async with BleakClient(DEVICE_ADDRESS) as client:
             if client.is_connected:
@@ -53,10 +58,16 @@ async def fetch_battery():
                 battery_bytes = await client.read_gatt_char(BATTERY_CHAR_UUID)
                 level = int(battery_bytes[0])
                 current_battery = level
+                #---------Get Voltage by terminal-----------
+                await client.write_gatt_char(RX_UUID, data_to_send, response=True)
+                rdata = await client.read_gatt_char(TX_UUID)
+                current_voltage = round(float(rdata.decode()),2)
+                print(f"Voltage: {current_voltage}")
+                #-------------------------------------------
                 return level
     except Exception as e:
         print(f"Ошибка подключения к BLE: {e}")
-        current_battery = "Ошибка"
+        current_battery = "BLE Error.."
     return None
 
 
@@ -76,8 +87,11 @@ def ble_loop_worker():
                 subprocess.run(["shutdown", "/s", "/t", "0"])
 
         if icon:
-            # Обновляем текст при наведении
-            icon.title = f"Батарея BLE: {current_battery}%"
+            # Обновляем текст при наведении (Hint)
+            if isinstance(current_battery, str):
+                icon.title = current_battery
+            else:
+                icon.title = f"Battery level: {current_battery}%"
             # Обновляем иконку на панели задач
             icon.icon = create_battery_icon(current_battery)
             icon.update_menu()
@@ -101,15 +115,15 @@ def start_tray():
     global icon
     menu = pystray.Menu(
         pystray.MenuItem(
-            lambda text: f"Заряд: {current_battery}%", action=None, enabled=False
+            lambda text: f"Battery level: {current_battery}%", action=None, enabled=False
         ),
-        pystray.MenuItem("Выход", on_exit),
+        pystray.MenuItem("Exit", on_exit),
     )
 
     icon = pystray.Icon(
         "ble_battery_monitor",
         create_battery_icon(current_battery),
-        title="Мониторинг BLE батареи...",
+        title="Monitoring BLE Battery...",
         menu=menu,
     )
 
